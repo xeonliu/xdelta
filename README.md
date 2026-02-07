@@ -43,6 +43,10 @@ python setup.py install
 
 The library now includes multi-threaded processing support for improved performance on multi-core systems. The parallel processing infrastructure is available through both the C API and Python bindings.
 
+# CI/CD
+
+This repository uses GitHub Actions for continuous integration. See [CI_README.md](CI_README.md) ([中文](CI_README_CN.md)) for details about the automated build and test system.
+
 
 
 
