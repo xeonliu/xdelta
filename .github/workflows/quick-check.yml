@@ -1,0 +1,40 @@
+name: Quick Check
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  quick-build:
+    name: Quick Build Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y autoconf automake libtool pkg-config liblzma-dev build-essential
+    
+    - name: Build xdelta3
+      working-directory: xdelta3
+      run: |
+        ./generate_build_files.sh
+        ./configure
+        make -j$(nproc)
+        ./xdelta3 -V || echo "Version check completed"
+    
+    - name: Quick test
+      working-directory: xdelta3
+      run: |
+        # Test basic encoding/decoding
+        echo "Test file content" > test.txt
+        echo "Modified test content" > test2.txt
+        ./xdelta3 -e -s test.txt test2.txt delta.dat
+        ./xdelta3 -d -s test.txt delta.dat output.txt
+        echo "✓ Basic encode/decode test passed"

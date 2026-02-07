@@ -1,5 +1,7 @@
 # Xdelta
 
+[![Build and Test](https://github.com/xeonliu/xdelta/actions/workflows/build.yml/badge.svg)](https://github.com/xeonliu/xdelta/actions/workflows/build.yml)
+
 Xdelta version 3 is a C library and command-line tool for delta
 compression using VCDIFF/RFC 3284 streams.
 
