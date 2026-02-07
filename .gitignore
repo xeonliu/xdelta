@@ -30,3 +30,14 @@ stamp-h1
 xdelta3/xdelta3
 xdelta3decode
 xdelta3regtest
+xdelta3checksum
+xdelta3/parallel_test
+*.pyc
+*.pyo
+__pycache__/
+*.so
+*.dylib
+*.dll
+dist/
+*.egg-info/
+.pytest_cache/
