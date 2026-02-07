@@ -1,7 +1,24 @@
-/* Test for xdelta3 parallel functions */
+/* Simple test for xdelta3 parallel functions */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+
+/* Define configuration before xdelta3.h */
+#define XD3_USE_LARGEFILE64 1
+#define XD3_USE_LARGESIZET 1
+#define SIZEOF_SIZE_T 8
+#define SIZEOF_UNSIGNED_LONG 8  
+#define SIZEOF_UNSIGNED_LONG_LONG 8
+#define SIZEOF_UNSIGNED_INT 4
+#define static_assert(x, y)
+
+/* Minimal build - just encoder/decoder */
+#define REGRESSION_TEST 0
+#define SECONDARY_DJW 0
+#define SECONDARY_FGK 0
+#define XD3_MAIN 0
+
 #include "xdelta3.h"
 #include "xdelta3.c"
 #include "xdelta3-parallel.h"

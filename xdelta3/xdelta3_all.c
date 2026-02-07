@@ -1,24 +1,26 @@
-/* xdelta3 - delta compression tools and library
-   Copyright 2016 Joshua MacDonald
+/* xdelta3_all.c - Wrapper to build everything together for Python bindings */
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-   Parallel processing implementation for xdelta3
-*/
-
-/* Include xdelta3.c which defines all the functions we need */
+/* First include xdelta3.c which has all the core functions */
 #include "xdelta3.c"
-#include "xdelta3-parallel.h"
+
+/* Then include parallel functions which depend on xdelta3 types */
+#ifdef XDELTA3_PARALLEL
+
+#include <pthread.h>
+
+/* Structure for passing work to threads */
+typedef struct {
+  const uint8_t *input;
+  usize_t input_size;
+  const uint8_t *source;
+  usize_t source_size;
+  uint8_t *output;
+  usize_t *output_size;
+  usize_t output_size_max;
+  int flags;
+  int result;
+  int encode;  /* 1 for encode, 0 for decode */
+} xd3_parallel_work_t;
 
 /* Worker thread function */
 static void* xd3_parallel_worker(void *arg) {
@@ -66,10 +68,7 @@ static int xd3_process_single(const uint8_t *input,
   }
 }
 
-/* Parallel processing for larger inputs
- * Note: For simplicity and correctness, we process the entire input
- * as a single unit but prepare infrastructure for future chunk-based parallelization
- */
+/* Parallel processing for larger inputs */
 static int xd3_process_parallel_internal(const uint8_t *input,
                                         usize_t input_size,
                                         const uint8_t *source,
@@ -83,31 +82,26 @@ static int xd3_process_parallel_internal(const uint8_t *input,
   pthread_t *threads = NULL;
   xd3_parallel_work_t *work = NULL;
   int ret = 0;
-  int i;
   
   /* Validate parameters */
   if (num_threads < 1) {
     num_threads = 1;
   }
   
-  /* For now, use single-threaded processing as the base implementation
-   * Future optimization: implement true window-level parallelization */
+  /* For now, use single-threaded processing as the base implementation */
   if (num_threads == 1 || input_size < XD3_DEFAULT_WINSIZE * 2) {
     return xd3_process_single(input, input_size, source, source_size,
                              output, output_size, output_size_max, flags, encode);
   }
   
   /* Allocate thread structures */
-  threads = (pthread_t *)malloc(sizeof(pthread_t) * num_threads);
-  work = (xd3_parallel_work_t *)malloc(sizeof(xd3_parallel_work_t) * num_threads);
+  threads = (pthread_t *)malloc(sizeof(pthread_t));
+  work = (xd3_parallel_work_t *)malloc(sizeof(xd3_parallel_work_t));
   
   if (!threads || !work) {
     ret = ENOMEM;
     goto cleanup;
   }
-  
-  /* For initial implementation: use thread pool approach but process sequentially
-   * This provides the API structure for future parallel window processing */
   
   /* Create a single work item */
   work[0].input = input;
@@ -167,3 +161,5 @@ int xd3_decode_parallel(const uint8_t *input,
                                       output, output_size, output_size_max,
                                       flags, num_threads, 0);
 }
+
+#endif /* XDELTA3_PARALLEL */

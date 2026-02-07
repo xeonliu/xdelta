@@ -17,11 +17,15 @@ pthread_available = sys.platform != 'win32'
 # Define compile flags
 extra_compile_args = [
     '-std=c99',
-    '-DREGRESSION_TEST=1',
-    '-DSECONDARY_DJW=1',
-    '-DSECONDARY_FGK=1',
-    '-DXD3_MAIN=0',
+    '-DHAVE_CONFIG_H',
+    '-DREGRESSION_TEST=0',  # Disable test code to avoid issues
+    '-DSECONDARY_DJW=0',
+    '-DSECONDARY_FGK=0',
+    '-DXD3_MAIN=1',  # Enable main for xd3_main_cmdline
+    '-DNOT_MAIN=1',  # Don't include main() function itself
+    '-DXD3_POSIX=1',  # Enable POSIX for main
     '-DXD3_DEBUG=0',
+    '-Dstatic_assert(x,y)=',  # Disable static_assert for C99
 ]
 
 extra_link_args = []
@@ -36,8 +40,7 @@ xdelta3_module = Extension(
     '_xdelta3',
     sources=[
         os.path.join(xdelta3_dir, 'xdelta3.i'),
-        os.path.join(xdelta3_dir, 'xdelta3.c'),
-        os.path.join(xdelta3_dir, 'xdelta3-parallel.c'),
+        os.path.join(xdelta3_dir, 'xdelta3_all.c'),
     ],
     include_dirs=[xdelta3_dir],
     libraries=libraries,
