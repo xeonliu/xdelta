@@ -3,6 +3,9 @@
 %import argcargv.i
 %{
 #include "xdelta3.h"
+#ifdef XDELTA3_PARALLEL
+#include "xdelta3-parallel.h"
+#endif
 
 int xd3_main_cmdline (int ARGC, char **ARGV);
 %}
@@ -12,7 +15,11 @@ int xd3_main_cmdline (int ARGC, char **ARGV);
 
 %define %max_output_withsize(TYPEMAP, SIZE, MAXSIZE)
 %typemap(in) MAXSIZE (unsigned int alloc_size) {
-  $1 = alloc_size = PyInt_AsLong(obj2);
+  #if PY_VERSION_HEX >= 0x03000000
+    $1 = alloc_size = PyLong_AsLong(obj2);
+  #else
+    $1 = alloc_size = PyInt_AsLong(obj2);
+  #endif
 }
 %typemap(in,numinputs=0) (TYPEMAP, SIZE) {
 }
@@ -25,7 +32,11 @@ int xd3_main_cmdline (int ARGC, char **ARGV);
   if (result == 0) {
     PyObject *o;
     // alloc_size7 now carries actual size
-    o = PyString_FromStringAndSize($1,alloc_size7);
+    #if PY_VERSION_HEX >= 0x03000000
+      o = PyBytes_FromStringAndSize($1,alloc_size7);
+    #else
+      o = PyString_FromStringAndSize($1,alloc_size7);
+    #endif
     $result = t_output_helper($result,o);
   } else {
     $result = t_output_helper($result,Py_None);
@@ -56,6 +67,28 @@ int     xd3_decode_memory (const uint8_t *input,
 			   usize_t       *output_size,
 			   usize_t        avail_output,
 			   int            flags);
+
+#ifdef XDELTA3_PARALLEL
+int     xd3_encode_parallel (const uint8_t *input,
+			     usize_t        input_size,
+			     const uint8_t *source,
+			     usize_t        source_size,
+			     uint8_t       *output_buffer,
+			     usize_t       *output_size,
+			     usize_t        avail_output,
+			     int            flags,
+			     int            num_threads);
+
+int     xd3_decode_parallel (const uint8_t *input,
+			     usize_t        input_size,
+			     const uint8_t *source,
+			     usize_t        source_size,
+			     uint8_t       *output_buf,
+			     usize_t       *output_size,
+			     usize_t        avail_output,
+			     int            flags,
+			     int            num_threads);
+#endif
 
 int     xd3_main_cmdline (int ARGC, char **ARGV);
 

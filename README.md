@@ -19,6 +19,28 @@ The original GPL licensed Xdelta lives at http://github.com/jmacd/xdelta-gpl.
 
 See the [command-line usage](https://github.com/jmacd/xdelta/blob/wiki/CommandLineSyntax.md).  See [wiki directory](https://github.com/jmacd/xdelta/tree/wiki).
 
+# Python Bindings
+
+This repository includes Python bindings for xdelta3 with multi-threading support. See [PYTHON_README.md](PYTHON_README.md) for installation and usage instructions.
+
+Quick example:
+```python
+import xdelta3_wrapper as xdelta3
+
+# Create and apply patches easily
+patch = xdelta3.encode(new_data, old_data)
+reconstructed = xdelta3.decode(patch, old_data)
+```
+
+Install:
+```bash
+python setup.py install
+```
+
+# Multi-core Support
+
+The library now includes multi-threaded processing support for improved performance on multi-core systems. The parallel processing infrastructure is available through both the C API and Python bindings.
+
 
 
 

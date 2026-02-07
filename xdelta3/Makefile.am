@@ -19,6 +19,7 @@ common_SOURCES = \
 	  xdelta3-merge.h \
 	  xdelta3-second.h \
 	  xdelta3-test.h \
+	  xdelta3-parallel.h \
           xdelta3-cfgs.h \
 	  xdelta3.h
 
@@ -90,8 +91,8 @@ endif
 #common_CFLAGS += -O2
 
 # For additional debugging, add -DXD3_DEBUG=1, 2, 3, ...
-xdelta3_CFLAGS = $(C_WFLAGS) $(common_CFLAGS) -DXD3_DEBUG=0
-xdelta3_LDADD = -lm
+xdelta3_CFLAGS = $(C_WFLAGS) $(common_CFLAGS) -DXD3_DEBUG=0 -DXDELTA3_PARALLEL=1
+xdelta3_LDADD = -lm -lpthread
 
 xdelta3decode_CFLAGS = \
 	$(C_WFLAGS) \
